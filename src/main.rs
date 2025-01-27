@@ -41,9 +41,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::List { path } => list_files(&path)?,
         Commands::Stat { path } => stat_files(&path)?,
-        Commands::Rename { path, prefix } => {
-            
-        }
+        Commands::Rename { path, prefix } => rename_files(&path, &prefix)?,
     }
     Ok(())
 }
@@ -76,6 +74,26 @@ fn stat_files(path: &PathBuf) -> Result<()> {
 
     for (ext, count) in counts {
         println!("{} : {}个", ext, count);
+    }
+    Ok(())
+}
+
+//重命名文件
+fn rename_files(path: &PathBuf, prefix: &str) -> Result<()> {
+    let files: Vec<_> = WalkDir::new(path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+        .collect();
+    for file in files {
+        let old_path = file.path();
+        let file_name = old_path.file_name().unwrap().to_str().unwrap();
+        let new_name = format!("{}{}", prefix, file_name);
+        let new_path = old_path.with_file_name(new_name);
+
+        if let Err(e) = std::fs::rename(old_path, new_path) {
+            eprintln!("重命名失败: {}", e);
+        }
     }
     Ok(())
 }
