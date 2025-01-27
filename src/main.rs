@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::{Ok, Result};
 use clap::{Parser, Subcommand};
@@ -21,14 +21,29 @@ enum Commands {
     List {
         #[arg(short, long, default_value = ".")]
         path: PathBuf,
-    }
+    },
+    ///按类型统计文件
+    Stat {
+        #[arg(short, long, default_value= ".")]
+        path: PathBuf,
+    },
+    ///批量重命名文件(添加前缀)
+    Rename {
+        #[arg(short, long, default_value = ".")]
+        path: PathBuf,
+        #[arg(short, long)]
+        prefix: String,
+    } 
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
         Commands::List { path } => list_files(&path)?,
-        _ => unimplemented!()
+        Commands::Stat { path } => stat_files(&path)?,
+        Commands::Rename { path, prefix } => {
+            
+        }
     }
     Ok(())
 }
@@ -39,6 +54,28 @@ fn list_files(path: &PathBuf) -> Result<()> {
     for entry in WalkDir::new(path).max_depth(1) {
         let entry = entry?;
         println!("- {}", entry.path().display());
+    }
+    Ok(())
+}
+
+//统计文件类型
+fn stat_files(path: &PathBuf) -> Result<()> {
+    let mut counts  = HashMap::new();
+
+    for entry in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
+        if entry.file_type().is_file() {
+            let ext = entry
+                .path()
+                .extension()
+                .and_then(|e| e.to_str())
+                .unwrap_or("unknown")
+                .to_string();
+            *counts.entry(ext).or_insert(0) += 1;    
+        }
+    }
+
+    for (ext, count) in counts {
+        println!("{} : {}个", ext, count);
     }
     Ok(())
 }
