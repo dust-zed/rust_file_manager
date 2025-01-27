@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+clap = { version = "4.4", features = ["derive"] }   #命令行解析
+rayon = "1.8"                                       #并行处理
+walkdir = "2.4"                                     #遍历目录
+anyhow = "1.0"                                      #简化错误处理
