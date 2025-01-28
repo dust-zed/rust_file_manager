@@ -73,7 +73,7 @@ fn search_by_content(
             let buf_reader = BufReader::new(file);
             for line in buf_reader.lines() {
                 let line = match line {
-                    Err(_) => break, //非utf_8编码的文件直接跳过
+                    Err(_) => break, //跳过无法处理的文件，包括权限不足，非utf_8编码文件
                     Result::Ok(line) => line
                 };
                 let line_check = if case_sensitive {
