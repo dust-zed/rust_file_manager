@@ -6,10 +6,6 @@ mod commands;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    let x = 42;
-    let closure = move || x;
-    closure();
-    closure();
     match cli.command {
         Commands::List { path } => list::list_files(&path)?,
         Commands::Stat { path } => stat::stat_files(&path)?,
