@@ -4,6 +4,7 @@ use clap::{Parser, Subcommand};
 pub mod list;
 pub mod stat;
 pub mod rename;
+pub mod search;
 
 //定义命令行参数结构
 #[derive(Parser)]
@@ -33,5 +34,18 @@ pub(crate) enum Commands {
         path: PathBuf,
         #[arg(short, long)]
         prefix: String,
-    } 
+    },
+    ///按内容和按文件名检索文件
+    Search {
+        #[arg(short, long, default_value = ".")]
+        path: PathBuf,
+        #[arg(short, long)]
+        keyword: String,
+        #[arg(long)]
+        content: bool,
+        #[arg(long, long)]
+        recursive: bool,
+        #[arg(long)]
+        case_sensitive: bool,
+    }
 }
